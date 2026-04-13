@@ -17,104 +17,7 @@ interface NewsArticle {
   category: string;
 }
 
-const fallbackArticles: NewsArticle[] = [
-  {
-    id: "1",
-    title: "AI Regulation Framework Advances in European Parliament",
-    source: "Reuters",
-    url: "#",
-    published_at: "2025-06-15T10:30:00Z",
-    summary: "The European Parliament has moved forward with comprehensive AI regulation proposals that would establish new oversight mechanisms for high-risk AI systems across member states.",
-    sentiment: 0.3,
-    sentiment_label: "neutral",
-    topics: ["AI", "Regulation", "Europe"],
-    category: "Politics",
-  },
-  {
-    id: "2",
-    title: "Quantum Computing Breakthrough Achieves 1000-Qubit Milestone",
-    source: "TechCrunch",
-    url: "#",
-    published_at: "2025-06-15T09:15:00Z",
-    summary: "MIT researchers have demonstrated a quantum processor capable of maintaining coherence across 1000 qubits, marking a significant step toward practical quantum computing applications.",
-    sentiment: 0.85,
-    sentiment_label: "positive",
-    topics: ["Quantum Computing", "MIT", "Research"],
-    category: "Technology",
-  },
-  {
-    id: "3",
-    title: "Global Supply Chain Recovery Accelerates as Port Strikes Resolved",
-    source: "Bloomberg",
-    url: "#",
-    published_at: "2025-06-15T08:45:00Z",
-    summary: "Major port operations have resumed across the US West Coast following resolution of labor disputes, with shipping volumes expected to normalize within two weeks.",
-    sentiment: 0.72,
-    sentiment_label: "positive",
-    topics: ["Supply Chain", "Logistics", "Trade"],
-    category: "Finance",
-  },
-  {
-    id: "4",
-    title: "New Climate Report Shows Record Ocean Temperatures in 2025",
-    source: "Nature",
-    url: "#",
-    published_at: "2025-06-15T07:30:00Z",
-    summary: "Ocean surface temperatures have reached unprecedented levels according to new satellite data, with implications for marine ecosystems and weather patterns worldwide.",
-    sentiment: -0.6,
-    sentiment_label: "negative",
-    topics: ["Climate", "Ocean", "Environment"],
-    category: "Science",
-  },
-  {
-    id: "5",
-    title: "Federal Reserve Signals Potential Rate Cut Amid Cooling Inflation",
-    source: "WSJ",
-    url: "#",
-    published_at: "2025-06-15T06:00:00Z",
-    summary: "Fed Chair indicated openness to rate adjustments in Q3 as inflation metrics continue their downward trajectory toward the 2% target.",
-    sentiment: 0.55,
-    sentiment_label: "positive",
-    topics: ["Federal Reserve", "Interest Rates", "Inflation"],
-    category: "Finance",
-  },
-  {
-    id: "6",
-    title: "SpaceX Successfully Launches Starship for Mars Mission Test",
-    source: "Space.com",
-    url: "#",
-    published_at: "2025-06-14T22:00:00Z",
-    summary: "SpaceX completed its most ambitious Starship test flight yet, with the vehicle achieving stable orbit and demonstrating key technologies needed for future Mars missions.",
-    sentiment: 0.9,
-    sentiment_label: "positive",
-    topics: ["SpaceX", "Mars", "Space"],
-    category: "Technology",
-  },
-  {
-    id: "7",
-    title: "Cybersecurity Alert: Major Vulnerability Found in Popular Cloud Platform",
-    source: "Ars Technica",
-    url: "#",
-    published_at: "2025-06-14T20:15:00Z",
-    summary: "Security researchers disclosed a critical zero-day vulnerability affecting millions of cloud infrastructure deployments, prompting emergency patches from major vendors.",
-    sentiment: -0.7,
-    sentiment_label: "negative",
-    topics: ["Cybersecurity", "Cloud", "Vulnerability"],
-    category: "Technology",
-  },
-  {
-    id: "8",
-    title: "WHO Declares End of Latest Global Health Emergency",
-    source: "BBC",
-    url: "#",
-    published_at: "2025-06-14T18:30:00Z",
-    summary: "The World Health Organization has officially downgraded the public health emergency status following sustained decline in case numbers across all regions.",
-    sentiment: 0.8,
-    sentiment_label: "positive",
-    topics: ["WHO", "Health", "Global"],
-    category: "Health",
-  },
-];
+// No fallback data - all data comes from the live backend API
 
 function sentimentDot(label: string) {
   switch (label) {
@@ -134,15 +37,18 @@ function formatTime(dateStr: string) {
 }
 
 export default function FeedsPage() {
-  const [articles, setArticles] = useState<NewsArticle[]>(fallbackArticles);
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/v1/news?limit=50")
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
+    fetch(`${apiBase}/api/v1/news?limit=50`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (d && Array.isArray(d)) setArticles(d); })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = articles.filter(

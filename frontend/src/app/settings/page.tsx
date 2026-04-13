@@ -14,14 +14,7 @@ interface FeedSource {
   article_count: number;
 }
 
-const fallbackFeeds: FeedSource[] = [
-  { id: "1", name: "Reuters World News", url: "https://feeds.reuters.com/reuters/worldNews", type: "rss", status: "active", last_fetched: "2 min ago", article_count: 1247 },
-  { id: "2", name: "TechCrunch", url: "https://techcrunch.com/feed/", type: "rss", status: "active", last_fetched: "5 min ago", article_count: 892 },
-  { id: "3", name: "Hacker News", url: "https://news.ycombinator.com/rss", type: "rss", status: "active", last_fetched: "1 min ago", article_count: 2103 },
-  { id: "4", name: "Bloomberg Markets", url: "https://www.bloomberg.com/feeds/markets", type: "web", status: "active", last_fetched: "8 min ago", article_count: 654 },
-  { id: "5", name: "ArXiv CS.AI", url: "https://arxiv.org/rss/cs.AI", type: "rss", status: "paused", last_fetched: "2h ago", article_count: 421 },
-  { id: "6", name: "BBC News", url: "https://feeds.bbci.co.uk/news/rss.xml", type: "rss", status: "active", last_fetched: "3 min ago", article_count: 1876 },
-];
+// No fallback data - all data comes from the live backend API
 
 function statusDot(status: string) {
   switch (status) {
@@ -32,10 +25,11 @@ function statusDot(status: string) {
 }
 
 export default function SettingsPage() {
-  const [feeds, setFeeds] = useState<FeedSource[]>(fallbackFeeds);
+  const [feeds, setFeeds] = useState<FeedSource[]>([]);
 
   useEffect(() => {
-    fetch("/api/v1/feeds")
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
+    fetch(`${apiBase}/api/v1/feeds`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (d && Array.isArray(d)) setFeeds(d); })
       .catch(() => {});

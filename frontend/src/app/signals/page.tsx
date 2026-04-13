@@ -16,38 +16,7 @@ interface Signal {
   drift_score: number;
 }
 
-const fallbackSignals: Signal[] = [
-  {
-    id: "1", signal_type: "Volume Spike", description: "Unusual surge in articles about AI regulation - 3.2x above baseline volume in the last 2 hours",
-    severity: "high", detected_at: "2025-06-15T10:15:00Z", source_count: 47,
-    related_topics: ["AI Regulation", "EU Parliament", "Tech Policy"], is_anomaly: true, drift_score: 0.87,
-  },
-  {
-    id: "2", signal_type: "Sentiment Shift", description: "Significant negative sentiment drift detected in cryptocurrency coverage - shifted from 0.6 to -0.3 in 4 hours",
-    severity: "medium", detected_at: "2025-06-15T09:45:00Z", source_count: 23,
-    related_topics: ["Cryptocurrency", "Bitcoin", "Market Crash"], is_anomaly: false, drift_score: 0.65,
-  },
-  {
-    id: "3", signal_type: "New Topic Burst", description: "Previously untracked topic cluster emerged: 'quantum computing breakthrough' with rapid article accumulation",
-    severity: "medium", detected_at: "2025-06-15T09:20:00Z", source_count: 31,
-    related_topics: ["Quantum Computing", "MIT", "Research"], is_anomaly: true, drift_score: 0.72,
-  },
-  {
-    id: "4", signal_type: "Source Anomaly", description: "Reuters publishing frequency 5x normal rate on climate topics - possible breaking event",
-    severity: "critical", detected_at: "2025-06-15T08:00:00Z", source_count: 12,
-    related_topics: ["Climate", "Reuters", "Breaking News"], is_anomaly: true, drift_score: 0.94,
-  },
-  {
-    id: "5", signal_type: "Concept Drift", description: "Topic model detected semantic drift in 'interest rates' cluster - new subtopics emerging around housing market",
-    severity: "low", detected_at: "2025-06-15T07:30:00Z", source_count: 18,
-    related_topics: ["Interest Rates", "Housing", "Mortgage"], is_anomaly: false, drift_score: 0.41,
-  },
-  {
-    id: "6", signal_type: "Cross-Topic Correlation", description: "Unusual correlation detected between 'cybersecurity' and 'healthcare' topic clusters - possible coordinated attack coverage",
-    severity: "high", detected_at: "2025-06-15T06:45:00Z", source_count: 29,
-    related_topics: ["Cybersecurity", "Healthcare", "Data Breach"], is_anomaly: true, drift_score: 0.78,
-  },
-];
+// No fallback data - all data comes from the live backend API
 
 function severityStyle(sev: string) {
   switch (sev) {
@@ -68,13 +37,16 @@ function severityIcon(sev: string) {
 }
 
 export default function SignalsPage() {
-  const [signals, setSignals] = useState<Signal[]>(fallbackSignals);
+  const [signals, setSignals] = useState<Signal[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/v1/signals")
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
+    fetch(`${apiBase}/api/v1/signals`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (d && Array.isArray(d)) setSignals(d); })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   return (

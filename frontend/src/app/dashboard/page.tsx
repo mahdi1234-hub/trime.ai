@@ -38,96 +38,20 @@ interface DashboardData {
   }[];
 }
 
-const fallbackData: DashboardData = {
-  total_articles: 12847,
-  active_trends: 23,
-  active_signals: 7,
-  feed_sources: 42,
-  articles_today: 342,
-  avg_sentiment: 0.62,
-  top_categories: [
-    { name: "Technology", count: 4521 },
-    { name: "Finance", count: 3102 },
-    { name: "Politics", count: 2345 },
-    { name: "Science", count: 1879 },
-    { name: "Health", count: 1000 },
-  ],
+const emptyData: DashboardData = {
+  total_articles: 0,
+  active_trends: 0,
+  active_signals: 0,
+  feed_sources: 0,
+  articles_today: 0,
+  avg_sentiment: 0.5,
+  top_categories: [],
   hourly_volume: Array.from({ length: 24 }, (_, i) => ({
     hour: `${i.toString().padStart(2, "0")}:00`,
-    count: Math.floor(Math.random() * 80) + 20,
+    count: 0,
   })),
-  recent_articles: [
-    {
-      id: "1",
-      title: "AI Regulation Framework Advances in European Parliament",
-      source: "Reuters",
-      published_at: "2 min ago",
-      sentiment_label: "neutral",
-      category: "Politics",
-    },
-    {
-      id: "2",
-      title: "Quantum Computing Breakthrough at MIT Research Lab",
-      source: "TechCrunch",
-      published_at: "8 min ago",
-      sentiment_label: "positive",
-      category: "Technology",
-    },
-    {
-      id: "3",
-      title: "Global Supply Chain Disruptions Ease After Port Strikes End",
-      source: "Bloomberg",
-      published_at: "15 min ago",
-      sentiment_label: "positive",
-      category: "Finance",
-    },
-    {
-      id: "4",
-      title: "New Climate Study Reveals Accelerated Arctic Ice Melt Patterns",
-      source: "Nature",
-      published_at: "23 min ago",
-      sentiment_label: "negative",
-      category: "Science",
-    },
-    {
-      id: "5",
-      title: "Federal Reserve Signals Potential Rate Cut in Q3 Meeting",
-      source: "WSJ",
-      published_at: "31 min ago",
-      sentiment_label: "positive",
-      category: "Finance",
-    },
-  ],
-  recent_trends: [
-    {
-      id: "1",
-      topic: "AI Regulation",
-      trend_score: 94,
-      trend_direction: "rising",
-      article_count: 187,
-    },
-    {
-      id: "2",
-      topic: "Quantum Computing",
-      trend_score: 87,
-      trend_direction: "rising",
-      article_count: 124,
-    },
-    {
-      id: "3",
-      topic: "Climate Policy",
-      trend_score: 72,
-      trend_direction: "stable",
-      article_count: 95,
-    },
-    {
-      id: "4",
-      topic: "Interest Rates",
-      trend_score: 68,
-      trend_direction: "falling",
-      article_count: 78,
-    },
-  ],
+  recent_articles: [],
+  recent_trends: [],
 };
 
 function StatCard({
@@ -180,15 +104,18 @@ function trendDirectionIcon(dir: string) {
 }
 
 export default function DashboardPage() {
-  const [data, setData] = useState<DashboardData>(fallbackData);
+  const [data, setData] = useState<DashboardData>(emptyData);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/v1/dashboard")
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
+    fetch(`${apiBase}/api/v1/dashboard`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (d) setData(d);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const maxVolume = Math.max(...data.hourly_volume.map((h) => h.count));

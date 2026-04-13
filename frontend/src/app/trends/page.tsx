@@ -16,44 +16,7 @@ interface Trend {
   sample_titles: string[];
 }
 
-const fallbackTrends: Trend[] = [
-  {
-    id: "1", topic: "AI Regulation", keywords: ["artificial intelligence", "regulation", "EU", "governance"],
-    article_count: 187, trend_score: 94, trend_direction: "rising",
-    first_seen: "2025-06-10T08:00:00Z", last_updated: "2025-06-15T10:30:00Z",
-    sample_titles: ["EU Parliament Advances AI Act", "US Considers AI Oversight Framework", "China Updates AI Governance Rules"],
-  },
-  {
-    id: "2", topic: "Quantum Computing", keywords: ["quantum", "qubits", "computing", "MIT"],
-    article_count: 124, trend_score: 87, trend_direction: "rising",
-    first_seen: "2025-06-12T14:00:00Z", last_updated: "2025-06-15T09:15:00Z",
-    sample_titles: ["1000-Qubit Breakthrough at MIT", "Google Announces Quantum Advantage", "IBM Quantum Roadmap Update"],
-  },
-  {
-    id: "3", topic: "Climate Policy", keywords: ["climate", "carbon", "emissions", "policy"],
-    article_count: 95, trend_score: 72, trend_direction: "stable",
-    first_seen: "2025-06-08T06:00:00Z", last_updated: "2025-06-15T07:30:00Z",
-    sample_titles: ["G7 Climate Commitments Review", "Carbon Market Reforms Proposed", "New Arctic Ice Data Released"],
-  },
-  {
-    id: "4", topic: "Interest Rates", keywords: ["federal reserve", "rates", "inflation", "monetary"],
-    article_count: 78, trend_score: 68, trend_direction: "falling",
-    first_seen: "2025-06-05T12:00:00Z", last_updated: "2025-06-15T06:00:00Z",
-    sample_titles: ["Fed Signals Rate Cut", "Inflation Cools to 2.3%", "Bond Markets React to Fed Guidance"],
-  },
-  {
-    id: "5", topic: "Space Exploration", keywords: ["spacex", "mars", "starship", "nasa"],
-    article_count: 65, trend_score: 81, trend_direction: "rising",
-    first_seen: "2025-06-14T20:00:00Z", last_updated: "2025-06-14T22:00:00Z",
-    sample_titles: ["Starship Test Flight Success", "NASA Artemis III Update", "Mars Colony Timeline Revised"],
-  },
-  {
-    id: "6", topic: "Cybersecurity Threats", keywords: ["cyber", "vulnerability", "zero-day", "ransomware"],
-    article_count: 52, trend_score: 76, trend_direction: "rising",
-    first_seen: "2025-06-14T18:00:00Z", last_updated: "2025-06-14T20:15:00Z",
-    sample_titles: ["Critical Cloud Vulnerability Disclosed", "Ransomware Attacks Surge 40%", "New State-Sponsored Campaign Detected"],
-  },
-];
+// No fallback data - all data comes from the live backend API
 
 function directionIcon(dir: string) {
   if (dir === "rising") return <ArrowUpRight className="w-4 h-4 text-green-600" />;
@@ -68,13 +31,16 @@ function scoreColor(score: number) {
 }
 
 export default function TrendsPage() {
-  const [trends, setTrends] = useState<Trend[]>(fallbackTrends);
+  const [trends, setTrends] = useState<Trend[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/v1/trends")
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
+    fetch(`${apiBase}/api/v1/trends`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (d && Array.isArray(d)) setTrends(d); })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   return (
