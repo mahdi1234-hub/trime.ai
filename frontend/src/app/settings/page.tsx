@@ -28,7 +28,7 @@ export default function SettingsPage() {
   const [feeds, setFeeds] = useState<FeedSource[]>([]);
 
   useEffect(() => {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://backend-five-mocha-89.vercel.app";
     fetch(`${apiBase}/api/v1/feeds`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (d && Array.isArray(d)) setFeeds(d); })

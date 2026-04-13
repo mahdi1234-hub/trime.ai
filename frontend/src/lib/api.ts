@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://backend-five-mocha-89.vercel.app";
 
 export interface NewsItem {
   id: string;

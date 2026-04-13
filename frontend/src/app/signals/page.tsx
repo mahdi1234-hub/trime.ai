@@ -41,7 +41,7 @@ export default function SignalsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://backend-five-mocha-89.vercel.app";
     const fetchData = () => {
       fetch(`${apiBase}/api/v1/signals`)
         .then((r) => (r.ok ? r.json() : null))

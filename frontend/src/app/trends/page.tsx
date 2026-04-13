@@ -35,7 +35,7 @@ export default function TrendsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://backend-five-mocha-89.vercel.app";
     const fetchData = () => {
       fetch(`${apiBase}/api/v1/trends`)
         .then((r) => (r.ok ? r.json() : null))
