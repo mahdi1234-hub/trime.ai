@@ -44,11 +44,16 @@ export default function FeedsPage() {
 
   useEffect(() => {
     const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
-    fetch(`${apiBase}/api/v1/news?limit=50`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (d && Array.isArray(d)) setArticles(d); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const fetchData = () => {
+      fetch(`${apiBase}/api/v1/news?limit=100`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => { if (d && Array.isArray(d)) setArticles(d); })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    };
+    fetchData();
+    const interval = setInterval(fetchData, 30000); // Refresh every 30s
+    return () => clearInterval(interval);
   }, []);
 
   const filtered = articles.filter(
@@ -104,7 +109,9 @@ export default function FeedsPage() {
             {filtered.map((article) => (
               <tr key={article.id} className="hover:bg-stone-300/20 transition-colors group">
                 <td className="py-4 px-6 max-w-xs">
-                  <p className="font-medium text-stone-900 tracking-tight truncate">{article.title}</p>
+                  <a href={article.url} target="_blank" rel="noopener noreferrer" className="font-medium text-stone-900 tracking-tight truncate block hover:text-stone-600 transition-colors">
+                    {article.title}
+                  </a>
                   <p className="text-xs text-stone-500 mt-0.5 truncate">{article.summary}</p>
                 </td>
                 <td className="py-4 px-6">
@@ -133,9 +140,9 @@ export default function FeedsPage() {
                   </div>
                 </td>
                 <td className="py-4 px-6 text-right">
-                  <button className="text-stone-400 hover:text-stone-900 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-stone-400 hover:text-stone-900 opacity-0 group-hover:opacity-100 transition-opacity inline-block">
                     <ExternalLink className="w-4 h-4" />
-                  </button>
+                  </a>
                 </td>
               </tr>
             ))}

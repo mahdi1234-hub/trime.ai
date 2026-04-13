@@ -42,11 +42,16 @@ export default function SignalsPage() {
 
   useEffect(() => {
     const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
-    fetch(`${apiBase}/api/v1/signals`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (d && Array.isArray(d)) setSignals(d); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const fetchData = () => {
+      fetch(`${apiBase}/api/v1/signals`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => { if (d && Array.isArray(d)) setSignals(d); })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    };
+    fetchData();
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   return (

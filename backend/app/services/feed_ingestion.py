@@ -13,14 +13,32 @@ from app.models.schemas import NewsArticle
 
 logger = logging.getLogger(__name__)
 
-# Default RSS feed sources
+# Default RSS feed sources covering all major categories
 DEFAULT_FEEDS = [
+    # General / World News
+    {"name": "BBC News", "url": "https://feeds.bbci.co.uk/news/rss.xml", "type": "rss"},
     {"name": "Reuters World News", "url": "https://feeds.reuters.com/reuters/worldNews", "type": "rss"},
+    {"name": "NPR News", "url": "https://feeds.npr.org/1001/rss.xml", "type": "rss"},
+    # Technology
     {"name": "TechCrunch", "url": "https://techcrunch.com/feed/", "type": "rss"},
     {"name": "Hacker News", "url": "https://news.ycombinator.com/rss", "type": "rss"},
-    {"name": "BBC News", "url": "https://feeds.bbci.co.uk/news/rss.xml", "type": "rss"},
-    {"name": "ArXiv CS.AI", "url": "https://rss.arxiv.org/rss/cs.AI", "type": "rss"},
     {"name": "Ars Technica", "url": "https://feeds.arstechnica.com/arstechnica/index", "type": "rss"},
+    {"name": "The Verge", "url": "https://www.theverge.com/rss/index.xml", "type": "rss"},
+    # Science
+    {"name": "ArXiv CS.AI", "url": "https://rss.arxiv.org/rss/cs.AI", "type": "rss"},
+    {"name": "Science Daily", "url": "https://www.sciencedaily.com/rss/all.xml", "type": "rss"},
+    {"name": "Phys.org", "url": "https://phys.org/rss-feed/", "type": "rss"},
+    # Finance / Business
+    {"name": "CNBC Top News", "url": "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114", "type": "rss"},
+    {"name": "MarketWatch", "url": "https://feeds.marketwatch.com/marketwatch/topstories/", "type": "rss"},
+    # Politics
+    {"name": "BBC Politics", "url": "https://feeds.bbci.co.uk/news/politics/rss.xml", "type": "rss"},
+    {"name": "The Hill", "url": "https://thehill.com/feed/", "type": "rss"},
+    # Sports
+    {"name": "BBC Sport", "url": "https://feeds.bbci.co.uk/sport/rss.xml", "type": "rss"},
+    {"name": "ESPN", "url": "https://www.espn.com/espn/rss/news", "type": "rss"},
+    # Health
+    {"name": "Medical News Today", "url": "https://www.medicalnewstoday.com/newsrss", "type": "rss"},
 ]
 
 
@@ -75,7 +93,7 @@ def categorize_article(title: str, summary: str) -> str:
         "Politics": ["government", "election", "president", "congress", "parliament", "policy", "regulation", "law", "political", "vote"],
         "Science": ["research", "study", "scientist", "discovery", "space", "physics", "biology", "climate", "environment", "ocean"],
         "Health": ["health", "medical", "hospital", "disease", "vaccine", "drug", "patient", "doctor", "who", "pandemic"],
-        "Sports": ["game", "team", "player", "championship", "league", "coach", "season", "match", "tournament", "olympic"],
+        "Sports": ["game", "team", "player", "championship", "league", "coach", "season", "match", "tournament", "olympic", "football", "soccer", "basketball", "tennis", "golf", "nfl", "nba", "premier league", "cricket", "rugby", "f1", "formula", "racing"],
     }
     for category, keywords in categories.items():
         if any(kw in text for kw in keywords):
