@@ -136,6 +136,21 @@ def fetch_rss_feed(feed_url: str, feed_name: str) -> list[NewsArticle]:
     return articles
 
 
+def _parse_date_for_sorting(date_str: str) -> datetime:
+    """Parse various RSS date formats into a datetime for sorting."""
+    from email.utils import parsedate_to_datetime
+    try:
+        return parsedate_to_datetime(date_str)
+    except Exception:
+        pass
+    try:
+        from dateutil.parser import parse as dateutil_parse
+        return dateutil_parse(date_str)
+    except Exception:
+        pass
+    return datetime.now(timezone.utc)
+
+
 def fetch_all_feeds(feed_sources: Optional[list[dict]] = None) -> list[NewsArticle]:
     """Fetch articles from all configured feed sources."""
     sources = feed_sources or DEFAULT_FEEDS
@@ -147,6 +162,6 @@ def fetch_all_feeds(feed_sources: Optional[list[dict]] = None) -> list[NewsArtic
         all_articles.extend(articles)
         logger.info("Got %d articles from %s", len(articles), source["name"])
 
-    # Sort by published date (newest first)
-    all_articles.sort(key=lambda a: a.published_at, reverse=True)
+    # Sort by published date (newest first) using proper date parsing
+    all_articles.sort(key=lambda a: _parse_date_for_sorting(a.published_at), reverse=True)
     return all_articles
