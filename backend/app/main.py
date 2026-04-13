@@ -36,23 +36,23 @@ async def lifespan(app: FastAPI):
     """Application lifecycle manager."""
     logger.info("Starting Trime.ai backend...")
 
-    # Run pipeline once at startup
-    logger.info("Running initial pipeline...")
-    try:
-        run_pipeline()
-    except Exception as exc:
-        logger.error("Initial pipeline run failed: %s", exc)
+    # Pipeline will be triggered on first API request (non-blocking)
+    # This avoids timeout on Vercel serverless cold starts
+    logger.info("Pipeline will run on first API request (lazy init)")
 
-    # Schedule periodic runs
-    scheduler.add_job(
-        run_pipeline,
-        "interval",
-        minutes=PIPELINE_INTERVAL_MINUTES,
-        id="realtime_pipeline",
-        replace_existing=True,
-    )
-    scheduler.start()
-    logger.info("Pipeline scheduled every %d minutes", PIPELINE_INTERVAL_MINUTES)
+    # Schedule periodic runs for non-serverless deployments
+    try:
+        scheduler.add_job(
+            run_pipeline,
+            "interval",
+            minutes=PIPELINE_INTERVAL_MINUTES,
+            id="realtime_pipeline",
+            replace_existing=True,
+        )
+        scheduler.start()
+        logger.info("Pipeline scheduled every %d minutes", PIPELINE_INTERVAL_MINUTES)
+    except Exception:
+        logger.info("Scheduler not started (serverless mode)")
 
     yield
 
